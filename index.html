@@ -272,6 +272,9 @@ var CF_OPTS = [
 
 var QS = [
   {type:'welcome'},
+  {id:'intro', type:'contact', sec:'Quick intro',
+   q:'Let\'s personalise your Leadership Navigator.',
+   hint:'Your name and company so your results feel specific — not generic.'},
   {type:'section', part:'PART 1', title:'Yourself', body:'Before you can lead others, you need to understand how you lead — naturally, under pressure, and when it matters most.'},
   {id:'s1', type:'single', grp:'style', sec:'Leadership Style',
    q:'Your startup has just pivoted. The team is uncertain about the new direction. What do you do first?',
@@ -436,9 +439,6 @@ var QS = [
      {k:'up', l:'Managing up — investors, board, advisors'},
      {k:'conf', l:'Building my own confidence and presence as a leader'}
    ]},
-  {id:'contact', type:'contact', sec:'Almost done',
-   q:'Where should we send your personalised playbook?',
-   hint:'Your full First 100 Days Playbook will arrive within 24 hours.'},
   {type:'results'}
 ];
 
@@ -706,7 +706,8 @@ function buildResults() {
   });
   h += '</div></div>';
 
-  h += '<div class="cta-card"><h3>Your Full First 100 Days Playbook</h3><p>Your on-screen profile is just the beginning. The full playbook includes your complete Days 1-30, 31-60, and 61-100 plan — personalised to your style, your team, and your company phase. It arrives in your inbox within 24 hours.</p><div class="cta-row"><input type="email" id="cta-email" placeholder="'+(ans['_email']||'your@email.com')+'"><button class="btn btn-orange" onclick="submitPlaybook()">Send my playbook</button></div><div class="thanks-box" id="thanks-box">You are all set. Your playbook will arrive within 24 hours. &mdash; Sharon</div></div>';
+  var ctaEmail = ans['_email'] || '';
+  h += '<div class="cta-card"><h3>Your Full First 100 Days Playbook</h3><p>Your on-screen profile is just the beginning. The full playbook includes your complete Days 1–30, 31–60, and 61–100 plan — personalised to your style, your team, and your company phase. It arrives in your inbox within 24 hours.</p><div class="cta-row"><input type="email" id="cta-email" value="'+ctaEmail+'" placeholder="your@email.com"><button class="btn btn-orange" onclick="submitPlaybook()">Send my playbook</button></div>'+(ctaEmail ? '<p style="font-size:13px;color:var(--text-light);margin-top:8px">Sending to <strong>'+ctaEmail+'</strong> — edit above if needed.</p>' : '')+'<div class="thanks-box" id="thanks-box">You are all set. Your playbook will arrive within 24 hours. &mdash; Sharon</div></div>';
 
   h += '<div class="byline"><p>The Leadership Navigator by <a href="https://sharondehmel.com">Sharon Dehmel</a> &middot; Leadership Architect &middot; Intercultural Coach</p><p style="margin-top:4px">Questions? <a href="mailto:sharon@sharondehmel.com">sharon@sharondehmel.com</a></p></div>';
 
@@ -797,7 +798,14 @@ function updateUI() {
     nextBtn.disabled = !answered;
     var vq2 = visibleQs();
     var nq = vq2[cur];
-    nextBtn.textContent = (nq && nq.type === 'contact') ? 'See my results' : 'Continue';
+    var cq = vq2[cur];
+    if (cq && cq.id === 'intro') {
+      nextBtn.textContent = 'Start the assessment \u2192';
+    } else if (nq && nq.type === 'results') {
+      nextBtn.textContent = 'See my results';
+    } else {
+      nextBtn.textContent = 'Continue';
+    }
   }
 
   var tot = totalSteps();
