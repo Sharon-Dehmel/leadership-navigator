@@ -130,6 +130,14 @@ body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--t
   transition: border-color 0.15s;
 }
 .contact-field input:focus { outline: none; border-color: var(--teal); }
+.consent-label {
+  display: flex; align-items: flex-start; gap: 10px;
+  font-size: 14px; color: var(--text-light); line-height: 1.55;
+  margin-top: 4px; cursor: pointer;
+}
+.consent-label input[type="checkbox"] { margin-top: 3px; min-width: 16px; height: 16px; accent-color: var(--teal); cursor: pointer; }
+.consent-label a { color: var(--teal); text-decoration: none; font-weight: 500; }
+.consent-label a:hover { text-decoration: underline; }
 
 #nav {
   position: fixed; bottom: 0; left: 0; right: 0; z-index: 199;
@@ -474,7 +482,7 @@ function isAnswered() {
     return Object.keys(r).length === q.stmts.length;
   }
   if (q.type === 'contact') {
-    return !!(ans['_name'] && ans['_company'] && ans['_email'] && ans['_email'].indexOf('@') > 0);
+    return !!(ans['_name'] && ans['_company'] && ans['_email'] && ans['_email'].indexOf('@') > 0 && ans['_consent']);
   }
   return true;
 }
@@ -641,6 +649,7 @@ function buildQ(q) {
     h += '<div class="contact-field"><label>Your first name</label><input type="text" id="inp-name" placeholder="e.g. Maria" value="'+(ans['_name']||'')+'"></div>';
     h += '<div class="contact-field"><label>Your company name</label><input type="text" id="inp-company" placeholder="e.g. Acme Labs" value="'+(ans['_company']||'')+'"></div>';
     h += '<div class="contact-field"><label>Your email address</label><input type="email" id="inp-email" placeholder="you@company.com" value="'+(ans['_email']||'')+'"></div>';
+    h += '<label class="consent-label"><input type="checkbox" id="inp-consent"'+(ans['_consent']?' checked':'')+'>I have read and agree to the <a href="/privacy.html" target="_blank">Privacy Policy</a>. My responses will be used only to generate and deliver my Leadership Navigator playbook.</label>';
   }
 
   h += '</div>';
@@ -709,7 +718,7 @@ function buildResults() {
   var ctaEmail = ans['_email'] || '';
   h += '<div class="cta-card"><h3>Your Full First 100 Days Playbook</h3><p>Your on-screen profile is just the beginning. The full playbook includes your complete Days 1–30, 31–60, and 61–100 plan — personalised to your style, your team, and your company phase. It arrives in your inbox within 24 hours.</p><div class="cta-row"><input type="email" id="cta-email" value="'+ctaEmail+'" placeholder="your@email.com"><button class="btn btn-orange" onclick="submitPlaybook()">Send my playbook</button></div>'+(ctaEmail ? '<p style="font-size:13px;color:var(--text-light);margin-top:8px">Sending to <strong>'+ctaEmail+'</strong> — edit above if needed.</p>' : '')+'<div class="thanks-box" id="thanks-box">You are all set. Your playbook will arrive within 24 hours. &mdash; Sharon</div></div>';
 
-  h += '<div class="byline"><p>The Leadership Navigator by <a href="https://sharondehmel.com">Sharon Dehmel</a> &middot; Leadership Architect &middot; Intercultural Coach</p><p style="margin-top:4px">Questions? <a href="mailto:sharon@sharondehmel.com">sharon@sharondehmel.com</a></p></div>';
+  h += '<div class="byline"><p>The Leadership Navigator by <a href="https://sharondehmel.com">Sharon Dehmel</a> &middot; Leadership Architect &middot; Intercultural Coach</p><p style="margin-top:4px">Questions? <a href="mailto:sharon@sharondehmel.com">sharon@sharondehmel.com</a> &middot; <a href="/privacy.html">Privacy Policy</a></p></div>';
 
   return h;
 }
@@ -779,6 +788,8 @@ function addListeners() {
   var inpCompany = document.getElementById('inp-company');
   if (inpCompany) inpCompany.addEventListener('input', function(){ ans['_company'] = this.value; updateUI(); });
   if (inpEmail) inpEmail.addEventListener('input', function(){ ans['_email'] = this.value; updateUI(); });
+  var inpConsent = document.getElementById('inp-consent');
+  if (inpConsent) inpConsent.addEventListener('change', function(){ ans['_consent'] = this.checked; updateUI(); });
 }
 
 function updateUI() {
