@@ -1,0 +1,860 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Leadership Navigator | Sharon Dehmel</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --teal: #2E7A7F;        /* darkened from #419599 — passes 4.5:1 on white */
+  --teal-light: #8CC8C0;
+  --teal-dark: #1E4F58;   /* darkened from #38636F — passes 7:1 on white */
+  --orange: #C0622E;      /* darkened from #DA835B — passes 4.5:1 on white */
+  --bg: #F7F9FA;
+  --white: #FFFFFF;
+  --text: #1A202C;        /* darkened from #2D3748 — passes 12:1 on white */
+  --text-light: #4A5568;  /* darkened from #718096 — passes 4.5:1 on white */
+  --border: #CBD5E0;
+  --sel-bg: #E6F4F4;
+  --shadow: 0 4px 20px rgba(0,0,0,0.08);
+  --radius: 12px;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; font-size: 16px; }
+
+#progress-wrap { position: fixed; top: 0; left: 0; right: 0; height: 4px; background: var(--border); z-index: 200; }
+#progress-bar { height: 100%; background: var(--orange); transition: width 0.4s ease; width: 0%; }
+
+#topbar {
+  position: fixed; top: 4px; left: 0; right: 0; z-index: 199;
+  background: var(--white); border-bottom: 1px solid var(--border);
+  padding: 14px 24px; display: flex; align-items: center; gap: 10px;
+}
+.logo-icon {
+  width: 30px; height: 30px; background: var(--teal);
+  border-radius: 6px; display: flex; align-items: center; justify-content: center;
+}
+.logo-icon svg { width: 18px; height: 18px; }
+.brand-name { font-weight: 600; color: var(--teal-dark); font-size: 16px; }
+#step-counter { margin-left: auto; font-size: 14px; color: var(--text-light); }
+
+#main { margin-top: 72px; padding: 40px 20px 100px; display: flex; flex-direction: column; align-items: center; }
+.card { width: 100%; max-width: 660px; }
+
+.welcome-card {
+  background: var(--white); border-radius: var(--radius);
+  box-shadow: var(--shadow); padding: 48px 40px; text-align: center;
+}
+.badge {
+  display: inline-block; background: var(--sel-bg); color: var(--teal-dark);
+  font-size: 13px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase;
+  padding: 6px 16px; border-radius: 20px; margin-bottom: 20px;
+}
+.welcome-card h1 { font-size: 42px; font-weight: 700; color: var(--teal-dark); line-height: 1.15; margin-bottom: 18px; }
+.welcome-card p { font-size: 18px; color: var(--text-light); line-height: 1.65; margin-bottom: 32px; }
+.meta-pills { display: flex; justify-content: center; gap: 20px; flex-wrap: wrap; margin-bottom: 36px; }
+.pill { font-size: 14px; color: var(--text-light); }
+.pill strong { color: var(--text); }
+
+.section-card {
+  background: var(--teal-dark); color: white;
+  border-radius: var(--radius); padding: 40px; text-align: center;
+}
+.section-card .part { font-size: 14px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.08em; color: var(--teal-light); margin-bottom: 10px; }
+.section-card h2 { font-size: 36px; font-weight: 700; margin-bottom: 12px; }
+.section-card p { font-size: 17px; opacity: 0.85; line-height: 1.65; }
+
+.q-card { background: var(--white); border-radius: var(--radius); box-shadow: var(--shadow); padding: 36px 40px; }
+.q-section { font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--teal); margin-bottom: 8px; }
+.q-text { font-size: 24px; font-weight: 700; color: var(--teal-dark); line-height: 1.35; margin-bottom: 10px; }
+.q-hint { font-size: 15px; color: var(--text-light); margin-bottom: 26px; line-height: 1.55; }
+
+.options { display: flex; flex-direction: column; gap: 9px; }
+.opt {
+  display: flex; align-items: flex-start; gap: 12px;
+  padding: 16px 18px; border: 2px solid var(--border);
+  border-radius: 10px; cursor: pointer; transition: all 0.15s; background: var(--white);
+  min-height: 44px;
+}
+.opt:focus-visible { outline: 3px solid var(--teal); outline-offset: 2px; }
+.opt:focus { outline: 3px solid var(--teal); outline-offset: 2px; }
+.opt:hover { border-color: var(--teal-light); background: var(--sel-bg); }
+.opt.selected { border-color: var(--teal); background: var(--sel-bg); }
+.opt-dot {
+  width: 20px; height: 20px; min-width: 20px;
+  border: 2px solid var(--border); border-radius: 50%;
+  display: flex; align-items: center; justify-content: center; margin-top: 2px;
+}
+.opt.selected .opt-dot { background: var(--teal); border-color: var(--teal); }
+.opt.selected .opt-dot::after { content: ''; width: 7px; height: 7px; border-radius: 50%; background: white; display: block; }
+.opt-box { border-radius: 4px !important; }
+.opt.selected .opt-box::after { content: '✓'; color: white; font-size: 12px; font-weight: 800; background: none !important; width: auto !important; height: auto !important; border-radius: 0 !important; }
+.opt-label { font-size: 16px; line-height: 1.55; }
+
+.pair-wrap { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.pair-opt {
+  padding: 20px; border: 2px solid var(--border); border-radius: 10px;
+  cursor: pointer; text-align: center; font-size: 16px; line-height: 1.5;
+  transition: all 0.15s; background: var(--white); min-height: 44px;
+}
+.pair-opt:focus-visible { outline: 3px solid var(--teal); outline-offset: 2px; }
+.pair-opt:focus { outline: 3px solid var(--teal); outline-offset: 2px; }
+.pair-opt:hover { border-color: var(--teal-light); background: var(--sel-bg); }
+.pair-opt.selected { border-color: var(--teal); background: var(--sel-bg); font-weight: 500; }
+
+.rating-wrap { width: 100%; }
+.rating-head { display: grid; grid-template-columns: 1fr repeat(5, 48px); gap: 4px; padding: 0 2px; margin-bottom: 4px; }
+.rating-head span { text-align: center; font-size: 13px; color: var(--text-light); font-weight: 600; }
+.rating-head span:first-child { text-align: left; }
+.rating-row { display: grid; grid-template-columns: 1fr repeat(5, 48px); gap: 4px; align-items: center; padding: 10px 2px; border-bottom: 1px solid var(--border); }
+.rating-row:last-child { border-bottom: none; }
+.rating-stmt { font-size: 16px; line-height: 1.5; padding-right: 6px; }
+.r-btn {
+  width: 44px; height: 44px; border: 2px solid var(--border); border-radius: 50%;
+  cursor: pointer; font-size: 14px; font-weight: 600; color: var(--text-light);
+  background: var(--white); display: flex; align-items: center; justify-content: center;
+  margin: 0 auto; transition: all 0.15s;
+}
+.r-btn:focus-visible { outline: 3px solid var(--teal); outline-offset: 2px; }
+.r-btn:focus { outline: 3px solid var(--teal); outline-offset: 2px; }
+.r-btn:hover { border-color: var(--teal-light); color: var(--teal); }
+.r-btn.selected { background: var(--teal); border-color: var(--teal); color: white; }
+
+.contact-field { margin-bottom: 18px; }
+.contact-field label { display: block; font-size: 16px; font-weight: 600; margin-bottom: 8px; }
+.contact-field input {
+  width: 100%; padding: 13px 15px; border: 2px solid var(--border);
+  border-radius: 8px; font-size: 15px; font-family: inherit; color: var(--text);
+  transition: border-color 0.15s;
+}
+.contact-field input:focus { outline: none; border-color: var(--teal); }
+
+#nav {
+  position: fixed; bottom: 0; left: 0; right: 0; z-index: 199;
+  background: var(--white); border-top: 1px solid var(--border);
+  padding: 14px 24px; display: flex; justify-content: space-between; align-items: center;
+}
+.btn {
+  padding: 14px 28px; border-radius: 8px; font-size: 16px;
+  font-weight: 600; font-family: inherit; cursor: pointer; border: none; transition: all 0.15s;
+  min-height: 44px;
+}
+.btn:focus-visible { outline: 3px solid var(--teal-dark); outline-offset: 3px; }
+.btn:focus { outline: 3px solid var(--teal-dark); outline-offset: 3px; }
+.btn-primary { background: var(--teal); color: white; }
+.btn-primary:hover { background: var(--teal-dark); }
+.btn-primary:disabled { background: var(--border); color: var(--text-light); cursor: not-allowed; }
+.btn-ghost { background: transparent; color: var(--text-light); border: 2px solid var(--border); }
+.btn-ghost:hover { border-color: var(--teal-light); color: var(--teal); }
+
+/* Results */
+.r-header { background: var(--teal-dark); color: white; border-radius: var(--radius); padding: 40px; text-align: center; margin-bottom: 16px; }
+.r-header .eyebrow { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--teal-light); margin-bottom: 8px; }
+.r-header h2 { font-size: 36px; font-weight: 700; margin-bottom: 10px; }
+.r-header p { font-size: 17px; opacity: 0.85; }
+.r-card { background: var(--white); border-radius: var(--radius); box-shadow: var(--shadow); padding: 28px 32px; margin-bottom: 14px; border-left: 4px solid var(--teal); }
+.r-card.alt { border-left-color: var(--orange); }
+.r-card h3 { font-size: 16px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--teal); margin-bottom: 10px; }
+.r-card.alt h3 { color: var(--orange); }
+.r-title { font-size: 22px; font-weight: 700; color: var(--teal-dark); margin-bottom: 12px; }
+.r-card p { font-size: 16px; line-height: 1.75; color: var(--text); }
+.r-card p + p { margin-top: 10px; }
+.flag-box { background: #FFF8F0; border: 1px solid #F6AD55; border-radius: 8px; padding: 12px 16px; font-size: 14px; line-height: 1.6; color: #744210; margin-top: 14px; }
+.flag-box strong { display: block; margin-bottom: 3px; }
+.tag-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+.tag { background: var(--sel-bg); color: var(--teal-dark); padding: 5px 13px; border-radius: 20px; font-size: 14px; font-weight: 500; border: 1px solid var(--teal-light); }
+.pri-list { margin-top: 12px; }
+.pri-item { display: flex; gap: 12px; align-items: flex-start; padding: 12px 0; border-bottom: 1px solid var(--border); }
+.pri-item:last-child { border-bottom: none; }
+.pri-num { width: 28px; height: 28px; min-width: 28px; background: var(--teal); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; margin-top: 2px; }
+.pri-item p { font-size: 15px; line-height: 1.65; }
+.cta-card { background: linear-gradient(135deg, var(--teal-dark), var(--teal)); color: white; border-radius: var(--radius); padding: 40px; text-align: center; margin-bottom: 16px; }
+.cta-card h3 { font-size: 28px; font-weight: 700; margin-bottom: 10px; }
+.cta-card p { font-size: 17px; opacity: 0.9; margin-bottom: 24px; line-height: 1.65; }
+.cta-row { display: flex; gap: 10px; max-width: 420px; margin: 0 auto; }
+.cta-row input { flex: 1; padding: 13px 15px; border: none; border-radius: 8px; font-size: 15px; font-family: inherit; }
+.cta-row input:focus { outline: 2px solid var(--teal-light); }
+.btn-orange { background: var(--orange); color: white; }
+.btn-orange:hover { background: #c4714a; }
+.thanks-box { background: #F0FFF4; border: 1px solid #68D391; color: #276749; border-radius: 8px; padding: 14px; font-size: 15px; text-align: center; margin-top: 12px; display: none; }
+.byline { text-align: center; padding: 20px; font-size: 13px; color: var(--text-light); }
+.byline a { color: var(--teal); text-decoration: none; }
+
+@media (max-width: 600px) {
+  .welcome-card, .q-card, .section-card { padding: 28px 20px; }
+  .welcome-card h1 { font-size: 30px; }
+  .section-card h2 { font-size: 26px; }
+  .q-text { font-size: 20px; }
+  .r-header h2 { font-size: 26px; }
+  .r-title { font-size: 18px; }
+  .pair-wrap { grid-template-columns: 1fr; }
+  .rating-head, .rating-row { grid-template-columns: 1fr repeat(5, 40px); }
+  .r-btn { width: 36px; height: 36px; font-size: 13px; }
+  .r-card { padding: 22px 18px; }
+  .cta-row { flex-direction: column; }
+  #step-counter { display: none; }
+}
+</style>
+</head>
+<body>
+
+<div id="progress-wrap" role="progressbar" aria-label="Assessment progress" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"><div id="progress-bar"></div></div>
+
+<header id="topbar" role="banner">
+  <div class="logo-icon" aria-hidden="true">
+    <svg viewBox="0 0 24 24" fill="none"><path d="M12 3L4 8v8l8 5 8-5V8L12 3z" stroke="white" stroke-width="2" stroke-linejoin="round"/><path d="M4 8l8 5 8-5" stroke="white" stroke-width="2"/></svg>
+  </div>
+  <span class="brand-name">Sharon Dehmel</span>
+  <span id="step-counter" aria-live="polite"></span>
+</header>
+
+<main id="main">
+  <div id="screen" class="card" aria-live="polite" aria-atomic="true"></div>
+</main>
+
+<nav id="nav" aria-label="Assessment navigation">
+  <button class="btn btn-ghost" id="btn-back" onclick="goBack()" aria-label="Go to previous question">Back</button>
+  <button class="btn btn-primary" id="btn-next" onclick="goNext()" aria-label="Continue to next question">Continue</button>
+</nav>
+
+<script>
+var cur = 0;
+var ans = {};
+
+var VALUES_OPTS = [
+  {k:'autonomy', l:'Autonomy — people have freedom to own their work'},
+  {k:'clarity', l:'Clarity — expectations and feedback are always clear'},
+  {k:'courage', l:'Courage — hard conversations happen; nothing important goes unsaid'},
+  {k:'excellence', l:'Excellence — standards are high and consistently upheld'},
+  {k:'fairness', l:'Fairness — everyone is treated equitably'},
+  {k:'growth', l:'Growth — people are always learning and developing'},
+  {k:'honesty', l:'Honesty — truth is told even when it is uncomfortable'},
+  {k:'inclusion', l:'Inclusion — every voice is heard; difference is an asset'},
+  {k:'innovation', l:'Innovation — new thinking is encouraged and rewarded'},
+  {k:'loyalty', l:'Loyalty — we back each other through difficulty'},
+  {k:'ownership', l:'Ownership — people take full responsibility for outcomes'},
+  {k:'pace', l:'Pace — we move fast; urgency is a competitive advantage'},
+  {k:'purpose', l:'Purpose — the work connects to something that genuinely matters'},
+  {k:'respect', l:'Respect — people are treated with dignity regardless of performance'},
+  {k:'trust', l:'Trust — we assume good intent and do what we say'},
+  {k:'wellbeing', l:'Wellbeing — people\'s energy and sustainability are protected'}
+];
+
+var CHALLENGE_OPTS = [
+  {k:'c0', l:'Getting everyone aligned on direction and priorities'},
+  {k:'c1', l:'Giving honest feedback without damaging relationships'},
+  {k:'c2', l:'Building trust — especially across distance or cultures'},
+  {k:'c3', l:'Motivating people when resources and certainty are limited'},
+  {k:'c4', l:'Managing co-founder dynamics'},
+  {k:'c5', l:'Making expectations clear without micromanaging'},
+  {k:'c6', l:'Building culture intentionally rather than accidentally'},
+  {k:'c7', l:'Keeping people\'s energy up through uncertainty'},
+  {k:'c8', l:'Having difficult performance conversations'},
+  {k:'c9', l:'Leading people who were previously my peers'},
+  {k:'c10', l:'Getting buy-in from investors or board'},
+  {k:'c11', l:'Leading across different cultural backgrounds'},
+  {k:'c12', l:'Building a feedback culture where truth gets told'},
+  {k:'c13', l:'Managing my own confidence and self-doubt'},
+  {k:'c14', l:'Balancing speed with doing things properly'}
+];
+
+var CF_OPTS = [
+  {k:'cf0', l:'Decision-making — who decides what and how'},
+  {k:'cf1', l:'Communication style — we process things very differently'},
+  {k:'cf2', l:'Pace — different sense of urgency'},
+  {k:'cf3', l:'Vision — we see the direction differently'},
+  {k:'cf4', l:'Roles — overlap or ambiguity in ownership'},
+  {k:'cf5', l:'Values — different ideas about how to treat people or build culture'},
+  {k:'cf6', l:'No significant friction currently'}
+];
+
+var QS = [
+  {type:'welcome'},
+  {type:'section', part:'PART 1', title:'Yourself', body:'Before you can lead others, you need to understand how you lead — naturally, under pressure, and when it matters most.'},
+  {id:'s1', type:'single', grp:'style', sec:'Leadership Style',
+   q:'Your startup has just pivoted. The team is uncertain about the new direction. What do you do first?',
+   hint:'Choose the response that most honestly reflects what you would actually do.',
+   opts:[
+     {k:'A', l:'Explain the big picture — where we are going and why it matters. Get people excited about the vision.'},
+     {k:'B', l:'Sit down with each person individually — understand their concerns and how to support their growth through the change.'},
+     {k:'C', l:'Bring everyone together. Make sure people feel connected and supported. Deal with uncertainty as a team.'},
+     {k:'D', l:'Get input from the team before finalising anything. We make better decisions together.'},
+     {k:'E', l:'Set clear expectations immediately. Show the team what excellent execution looks like and get moving.'},
+     {k:'F', l:'Be direct: here is the decision, here is why, here is what we each need to do.'}
+   ]},
+  {id:'s2', type:'single', grp:'style', sec:'Leadership Style',
+   q:'A key team member is consistently missing deadlines. The impact is affecting the rest of the team. What do you do?',
+   hint:'Be honest — what would you actually do?',
+   opts:[
+     {k:'A', l:'Have an honest conversation about how their work connects to the bigger mission and why it matters.'},
+     {k:'B', l:'Schedule a proper 1:1. Understand what is behind the pattern. Build a development plan together.'},
+     {k:'C', l:'Check in on how they are doing personally first. Something might be going on outside of work.'},
+     {k:'D', l:'Raise it with the team — get collective ownership of standards and expectations.'},
+     {k:'E', l:'Show them exactly how you would approach it and set a clear performance bar.'},
+     {k:'F', l:'Have a direct, private conversation. Name the problem clearly. Set a deadline for improvement.'}
+   ]},
+  {id:'s3', type:'single', grp:'style', sec:'Leadership Style',
+   q:'You are 48 hours from a major investor presentation and two things have gone wrong. What is your instinct?',
+   hint:'Under real pressure — what do you actually do?',
+   opts:[
+     {k:'A', l:'Refocus the team on what we are building and why — it is bigger than this moment.'},
+     {k:'B', l:'Have individual conversations — understand who needs what kind of support right now.'},
+     {k:'C', l:'Acknowledge the pressure together. Make sure the team feels okay. We are in this.'},
+     {k:'D', l:'Quick team huddle — what do we do? Everyone\'s input matters.'},
+     {k:'E', l:'Roll up your sleeves and lead from the front. Show what needs to happen.'},
+     {k:'F', l:'Triage fast. Assign clear ownership. Make decisions quickly and move.'}
+   ]},
+  {id:'s4', type:'single', grp:'style', sec:'Leadership Style',
+   q:'A strong new hire joins next week. What does your onboarding look like?',
+   opts:[
+     {k:'A', l:'I share the vision and purpose first. I want them to understand what we are building before anything else.'},
+     {k:'B', l:'I schedule time to understand their goals and how I can support their growth here.'},
+     {k:'C', l:'I introduce them to everyone and make sure they feel genuinely welcome from day one.'},
+     {k:'D', l:'I get their perspective early — fresh eyes are valuable and I want them to feel heard.'},
+     {k:'E', l:'I share what excellent looks like here: standards, pace, expectations. I want them hitting the ground running.'},
+     {k:'F', l:'Clear role, clear expectations, clear reporting. I give them what they need and get out of the way.'}
+   ]},
+  {id:'values', type:'multi', max:5, sec:'Your Values',
+   q:'Which 5 leadership values matter most to you?',
+   hint:'Choose the ones that, when violated, genuinely bother you. Select exactly 5.',
+   opts: VALUES_OPTS},
+  {id:'r_exec', type:'rating', dom:'exec', sec:'Your Strengths',
+   q:'How naturally true is each statement for you?',
+   hint:'1 = Rarely true · 5 = Almost always true',
+   stmts:['I finish what I start, even when it gets hard','I take personal responsibility for results — I do not blame circumstances','I bring structure and process to chaotic situations','I follow through on commitments reliably']},
+  {id:'r_infl', type:'rating', dom:'infl', sec:'Your Strengths',
+   q:'How naturally true is each statement?',
+   hint:'1 = Rarely true · 5 = Almost always true',
+   stmts:['I naturally persuade people to my point of view','I enjoy being in rooms where decisions are made','I bring energy and enthusiasm that moves others','I am comfortable with competition — I like to win']},
+  {id:'r_rel', type:'rating', dom:'rel', sec:'Your Strengths',
+   q:'How naturally true is each statement?',
+   hint:'1 = Rarely true · 5 = Almost always true',
+   stmts:['I notice when someone on the team is struggling before they say anything','I invest time in understanding what makes each person tick','I am the person people come to when they need support','I hold teams together in difficult moments']},
+  {id:'r_str', type:'rating', dom:'str', sec:'Your Strengths',
+   q:'How naturally true is each statement?',
+   hint:'1 = Rarely true · 5 = Almost always true',
+   stmts:['I am always thinking about what is next — the future, not just today','I love complex problems, especially ones without obvious answers','I read widely and collect ideas from unexpected places','I see patterns and connections others miss']},
+  {id:'p1', type:'pair', grp:'pressure', sec:'Under Pressure',
+   q:'Think about how you actually behave when things get difficult. Which is more true of you under pressure?',
+   hint:'Choose the one that is honestly more true — not what you would like to be true.',
+   opts:[{k:'D', l:'I take charge — I make decisions fast and keep moving'},{k:'I', l:'I talk to people — I process out loud and get energy from others'}]},
+  {id:'p2', type:'pair', grp:'pressure', sec:'Under Pressure',
+   q:'Under pressure, which is more true?',
+   opts:[{k:'C', l:'I slow down — I want to think it through before acting'},{k:'S', l:'I focus on the team — I want to make sure people are okay'}]},
+  {id:'p3', type:'pair', grp:'pressure', sec:'Under Pressure',
+   q:'When things go wrong, which matters more to you?',
+   opts:[{k:'D', l:'Getting the right result — even if the process is messy'},{k:'C', l:'Getting it right — I do not like moving before I am confident'}]},
+  {id:'p4', type:'pair', grp:'pressure', sec:'Under Pressure',
+   q:'Under pressure, you tend to...',
+   opts:[{k:'C', l:'Get quieter — you need space to think'},{k:'D', l:'Get louder — you need movement and momentum'}]},
+  {id:'p5', type:'pair', grp:'pressure', sec:'Under Pressure',
+   q:'When facing uncertainty under pressure...',
+   opts:[{k:'D', l:'I push for quick decisions — uncertainty is harder than a wrong call'},{k:'S', l:'I want everyone aligned before we move — I do not like leaving people behind'}]},
+  {type:'section', part:'PART 2', title:'Others', body:'Leadership only exists in relationship. Who are you leading — and what do they need from you?'},
+  {id:'loc', type:'single', sec:'Your Team',
+   q:'Where is your team based?',
+   opts:[
+     {k:'coloc', l:'All in the same location (fully co-located)'},
+     {k:'hyb_d', l:'Mostly in one location, some remote (hybrid — dominant location)'},
+     {k:'hyb_t', l:'Roughly split between in-person and remote (true hybrid)'},
+     {k:'rem_f', l:'Mostly remote, occasional in-person (remote-first)'},
+     {k:'rem_r', l:'Fully remote, distributed across countries'}
+   ]},
+  {id:'size', type:'single', sec:'Your Team',
+   q:'How many people are you directly leading right now?',
+   opts:[
+     {k:'solo', l:'Just me / co-founder only — no direct reports yet'},
+     {k:'sm', l:'2-5 people'},
+     {k:'md', l:'6-15 people'},
+     {k:'lg', l:'16-40 people'},
+     {k:'xl', l:'40+ people'}
+   ]},
+  {id:'exp', type:'single', sec:'Your Team',
+   q:'How would you describe your team\'s experience level?',
+   opts:[
+     {k:'jr', l:'Mostly early career / first roles in their field'},
+     {k:'sr', l:'Mostly experienced professionals (5+ years)'},
+     {k:'mix', l:'A mix — some very experienced, some early career'},
+     {k:'spec', l:'Deep specialists / domain experts'},
+     {k:'ldrs', l:'I am leading other team leaders or managers'}
+   ]},
+  {id:'cult', type:'single', sec:'Your Team',
+   q:'How culturally diverse is your team?',
+   opts:[
+     {k:'mono', l:'Mostly the same cultural background as me'},
+     {k:'bi', l:'One or two other nationalities / cultural backgrounds'},
+     {k:'multi', l:'Multiple nationalities — a genuinely multicultural team'},
+     {k:'dist', l:'Internationally distributed with significant cultural diversity'},
+     {k:'uns', l:'Not sure — I have not mapped it'}
+   ]},
+  {id:'cof', type:'single', sec:'Co-Founder',
+   q:'Do you have a co-founder?',
+   opts:[
+     {k:'solo', l:'No — I am a solo founder'},
+     {k:'one', l:'Yes — one co-founder'},
+     {k:'multi', l:'Yes — two or more co-founders'}
+   ]},
+  {id:'cof_rel', type:'single', sec:'Co-Founder', cond:true,
+   q:'How would you describe your co-founder relationship right now?',
+   opts:[
+     {k:'strong', l:'Strong — we communicate well and navigate disagreement constructively'},
+     {k:'func', l:'Functional — mostly good but some recurring friction points'},
+     {k:'strain', l:'Strained — there are significant unresolved tensions'},
+     {k:'early', l:'Early days — we have not been tested yet under pressure'}
+   ]},
+  {id:'cof_fri', type:'multi', max:7, sec:'Co-Founder', cond:true,
+   q:'What is the most common source of friction with your co-founder(s)?',
+   hint:'Select all that apply.',
+   opts: CF_OPTS},
+  {id:'chall', type:'multi', max:3, sec:'Current Challenges',
+   q:'What is the hardest thing about leading right now?',
+   hint:'Choose your top 3.',
+   opts: CHALLENGE_OPTS},
+  {type:'section', part:'PART 3', title:'Outcomes', body:'Your company phase determines what leadership the organisation actually needs right now.'},
+  {id:'phase', type:'single', sec:'Company Phase',
+   q:'Which best describes where your company is right now?',
+   opts:[
+     {k:'pre', l:'Pre-seed / Idea — testing the concept; limited revenue; team of 1-3'},
+     {k:'seed', l:'Seed / MVP — product exists and being tested; first customers; early funding'},
+     {k:'sA', l:'Early growth / Series A — product-market fit established; scaling the team'},
+     {k:'sB', l:'Scaling / Series B+ — revenue growing; building organisational infrastructure'},
+     {k:'scl', l:'Scale-up / International — established in home market; expanding internationally'}
+   ]},
+  {id:'urgent', type:'single', sec:'Your Priority',
+   q:'What is your most urgent leadership challenge right now?',
+   opts:[
+     {k:'pitch', l:'Pitching and influencing — investors, clients, partners, new hires'},
+     {k:'trust', l:'Building trust and credibility with a new or growing team'},
+     {k:'trans', l:'Transitioning from doing to leading — and figuring out how'},
+     {k:'cofnd', l:'Managing the co-founder relationship through a difficult period'},
+     {k:'cult', l:'Building culture deliberately before it builds itself badly'},
+     {k:'dist', l:'Leading across distance, time zones, or cultural differences'},
+     {k:'feedb', l:'Giving better feedback and having harder conversations'},
+     {k:'dev', l:'Developing the people around me so I am not the bottleneck'},
+     {k:'up', l:'Managing up — investors, board, advisors'},
+     {k:'conf', l:'Building my own confidence and presence as a leader'}
+   ]},
+  {id:'contact', type:'contact', sec:'Almost done',
+   q:'Where should we send your personalised playbook?',
+   hint:'Your full First 100 Days Playbook will arrive within 24 hours.'},
+  {type:'results'}
+];
+
+function visibleQs() {
+  return QS.filter(function(q) {
+    if (q.cond && ans['cof'] === 'solo') return false;
+    return true;
+  });
+}
+
+function totalSteps() {
+  return visibleQs().filter(function(q){ return q.id; }).length;
+}
+
+function doneSteps() {
+  return visibleQs().filter(function(q){ return q.id && ans[q.id] !== undefined; }).length;
+}
+
+function isAnswered() {
+  var vq = visibleQs();
+  var q = vq[cur];
+  if (!q) return false;
+  if (!q.id) return true;
+  if (q.type === 'single' || q.type === 'pair') return ans[q.id] !== undefined;
+  if (q.type === 'multi') {
+    var arr = ans[q.id] || [];
+    if (q.id === 'values') return arr.length === 5;
+    if (q.id === 'chall') return arr.length >= 1 && arr.length <= 3;
+    return arr.length >= 1;
+  }
+  if (q.type === 'rating') {
+    var r = ans[q.id] || {};
+    return Object.keys(r).length === q.stmts.length;
+  }
+  if (q.type === 'contact') {
+    return !!(ans['_name'] && ans['_email'] && ans['_email'].indexOf('@') > 0);
+  }
+  return true;
+}
+
+function calcStyle() {
+  var c = {A:0,B:0,C:0,D:0,E:0,F:0};
+  ['s1','s2','s3','s4'].forEach(function(id){ if(ans[id]) c[ans[id]]++; });
+  var s = Object.keys(c).sort(function(a,b){return c[b]-c[a];});
+  return {dom: s[0], sec: s[1]};
+}
+
+function calcStrength() {
+  var doms = ['exec','infl','rel','str'];
+  var sc = {};
+  doms.forEach(function(d){
+    var r = ans['r_'+d] || {};
+    var v = Object.values(r).filter(function(x){return x>0;});
+    sc[d] = v.length ? v.reduce(function(a,b){return a+b;},0)/v.length : 0;
+  });
+  var s = Object.keys(sc).sort(function(a,b){return sc[b]-sc[a];});
+  return s[0];
+}
+
+function calcDisc() {
+  var c = {D:0,I:0,S:0,C:0};
+  ['p1','p2','p3','p4','p5'].forEach(function(id){ if(ans[id]) c[ans[id]]=(c[ans[id]]||0)+1; });
+  return Object.keys(c).sort(function(a,b){return c[b]-c[a];})[0];
+}
+
+var STYLE_INFO = {
+  A:{name:'Visionary',power:'You make people feel like they are part of something worth doing. Investors buy vision before they buy product.',watch:'Vision without an execution plan leaves people inspired but adrift. Always pair the destination with what you are doing this week.',flag:null},
+  B:{name:'Coaching',power:'People feel seen and developed under your leadership. They stay. At scale, this makes you a magnet for talent who want to grow.',watch:'Coaching takes time. In a startup moving at pace you will be tempted to skip it. The 20 minutes you invest now saves 3 months of underperformance later.',flag:null},
+  C:{name:'Affiliative',power:'Your team trusts you. You create psychological safety that allows people to do their best work and tell you the truth when something is wrong.',watch:'Affiliative leaders sometimes avoid difficult conversations to protect harmony. Unspoken performance issues do not disappear — they compound.',flag:null},
+  D:{name:'Democratic',power:'You build genuine buy-in. Your team owns what they helped create — and that ownership drives real commitment.',watch:'In a startup making 50 decisions a week, consensus becomes a bottleneck. Decide which decisions need input and which ones you need to simply call.',flag:null},
+  E:{name:'Pacesetting',power:'Quality, speed, and personal accountability. You built what you have built by caring more than anyone else.',watch:'Research consistently shows Pacesetting has the most negative impact on team climate as a dominant style. The message your team receives — even unspoken — is that you do not trust them to do it as well as you would.',flag:'Your Pacesetting default built the product. Watch carefully as you scale — this style needs to be balanced with Coaching and Visionary approaches as your team grows.'},
+  F:{name:'Commanding',power:'Decisive leadership under pressure. In a crisis, you are exactly who the team needs. Clear, direct, no ambiguity.',watch:'Commanding style works in a crisis. As a default, it erodes trust and psychological safety — particularly in multicultural teams where direct authority can read as disrespect.',flag:'Commanding style is most effective used sparingly. This playbook will help you develop a wider range of approaches for sustained leadership.'}
+};
+
+var STR_INFO = {
+  exec:{name:'Executing',desc:'You get things done. You follow through. You build the kind of reliability that means people can count on you — and set the tone for a team that counts on each other.',tip:'Take visible ownership of the hardest, most uncertain parts of the work. Your team watches what you do with difficulty, not just with success.'},
+  infl:{name:'Influencing',desc:'You move people. You persuade, energise, and drive momentum. This is your most commercially valuable leadership strength — it is what makes investors believe and talented people choose you.',tip:'Use your influencing strength deliberately and ethically. Know the difference between inspiration and manipulation.'},
+  rel:{name:'Relationship Building',desc:'You hold the team together. You notice. You invest. In a world where 65% of startups are affected by co-founder conflict, your relational instinct is not soft — it is strategic.',tip:'Name it explicitly. Tell people: "I care about how this team functions as much as what it produces." Then back it up with the difficult conversations when culture starts to drift.'},
+  str:{name:'Strategic Thinking',desc:'You see what others miss. You think in futures, patterns, and possibilities — the ability to pivot intelligently before everyone else sees the better path.',tip:'Bring your team into your thinking more than feels natural. Your best insights are sitting in your head. The team needs to understand how you think, not just what you have decided.'}
+};
+
+var DISC_INFO = {
+  D:{name:'Dominance',desc:'Under pressure you move fast and take charge. Build the habit of one check-in question before acting: "What am I missing?" Silence from the team is not agreement.'},
+  I:{name:'Influence',desc:'Under pressure you reach for people and process out loud. Watch for talking before listening — the pressure conversation that starts with your conclusion closes down the information you actually need.'},
+  S:{name:'Steadiness',desc:'Under pressure you slow down and focus on the team. Your composure is a genuine asset — it produces calm in the room. Make sure it is an accurate signal, not just a managed performance.'},
+  C:{name:'Conscientiousness',desc:'Under pressure you want to think before acting and get it right. In a startup you will never have enough information. Practice making 70%-confident calls and learning from them — Annie Duke\'s Thinking in Bets is worth your time.'}
+};
+
+var PHASE_INFO = {
+  pre:{name:'Pre-seed / Idea',desc:'Your leadership job is to hold uncertainty long enough to find the truth. The discipline is staying curious long enough to find out whether you are building the right thing before committing to build it.',focus:'Ideation, customer discovery, reframing, and influence without authority — getting people to believe in something that does not fully exist yet.'},
+  seed:{name:'Seed / MVP',desc:'You have something. Now you need to know if it works — and convince the people who can help you find out. Your leadership job is to tell the story compellingly and listen to customers deeply.',focus:'Pitching, storytelling, customer empathy, early team trust. You are persuading as much as you are building.'},
+  sA:{name:'Series A / Early Growth',desc:'Product-market fit exists. Now the question is whether you can build an organisation that scales it. This is where most founder-leaders hit the wall — scaling a business requires leading people, and that is a completely different job.',focus:'The critical shift: from expert to enabler. From doing the best work to creating conditions for others to do their best work.'},
+  sB:{name:'Series B+ / Scaling',desc:'You are building an organisation now, not just a company. The founder\'s instinct — to stay close to everything — becomes the bottleneck. What got you here will not get you there.',focus:'Developing people, delegating with confidence, managing managers, building culture that does not depend entirely on you.'},
+  scl:{name:'Scale-up / International',desc:'You are operating across markets, cultures, and complexity that no single leadership style can navigate. The question is no longer whether you can lead — it is whether your leadership can travel.',focus:'Cross-cultural intelligence, distributed team leadership, leading through layers of management, ecosystem-level influence.'}
+};
+
+function getPriorities() {
+  var pris = [];
+  var ph = ans['phase'];
+  var urg = ans['urgent'];
+  var st = calcStyle();
+
+  if (ans['cof_rel'] === 'strain') {
+    pris.push({t:'Address the co-founder relationship first', b:'This is your number one priority — before team culture, investor presence, or anything else. An unresolved co-founder rupture undermines every other leadership investment you make. Create a dedicated space: not a business meeting, a relationship meeting. Start with: "What conversation are we not having that we need to have?"'});
+  }
+
+  var urgMap = {
+    pitch:{t:'Build your investor presence',b:'Know your frame before every investor conversation: who you are, what you are building, why you are the right person. List every concern an investor might have — then address the biggest ones before they ask. Practice your delivery until composure is automatic.'},
+    trust:{t:'Invest in relationships before performance',b:'In the first 30 days: hold a 1:1 with every direct report. Ask three questions only — what is working that I should not break? What is getting in your way? What do you wish you could tell me? Then listen. Do not fix. Do not defend. Just listen.'},
+    trans:{t:'Name the transition out loud',b:'If you have moved from peer to leader, say it: "This is new for both of us. Here is how I want to approach it." Your job has changed — success is no longer your own output, it is your team\'s output. That is the hardest shift in leadership, and almost nobody tells you it is coming.'},
+    cofnd:{t:'Create a decision-making structure before you need it',b:'Define who decides what before the next high-stakes disagreement. What goes to both of you? What can each person decide alone? Write it down. This is the infrastructure that turns co-founder conflict from a crisis into a conversation.'},
+    cult:{t:'Design culture deliberately',b:'Culture is not what you put on the wall — it is what you tolerate, reward, and ignore. Ask your team: "What does great look like here on our best day? What is getting in the way of that being every day?" Then pick one thing to change.'},
+    dist:{t:'Lead at distance with intention',b:'Everything that proximity does automatically, you must now do deliberately. Weekly 1:1s are non-negotiable. Every significant decision in writing. Build in informal time — 10 minutes at the start of team meetings for actual conversation, not work.'},
+    feedb:{t:'Start the feedback habit this week',b:'One piece of specific, honest positive feedback per week per team member — specific enough that they know exactly what you saw and why it mattered. This builds the trust that makes the difficult feedback land later. Then have the one conversation you have been avoiding.'},
+    dev:{t:'Invest in one person\'s development deeply',b:'Not the team — one person, this month. What do they want to become? What would help them get there? What can you specifically do? The best leaders make careers. Do this once, do it well, and watch what it does to your team\'s belief in you.'},
+    up:{t:'Know what your investors actually need',b:'Investors assess the person before the product. Come to every board interaction knowing what their current concern is. Lead with acknowledgement of the real question before presenting the polished answer.'},
+    conf:{t:'Reframe self-doubt as a question, not a verdict',b:'The self-doubt you are experiencing is not evidence that you are the wrong person for the role. It is evidence that you are taking the role seriously. The growth mindset hears self-doubt as: "What do I need to learn?" That is a very different response to the same feeling.'}
+  };
+
+  if (urg && urgMap[urg]) pris.push(urgMap[urg]);
+
+  var phMap = {
+    pre:{t:'Question before you build',b:'Run 10 customer conversations this month — not pitches, conversations. Ask: what are you trying to get done? What gets in the way? Listen for the words they use, not the words you would use. Stay curious long enough to find out if you are solving the right problem.'},
+    seed:{t:'Tell the story before you explain the product',b:'The brain decides in seconds whether to pay attention. Open with a specific, vivid problem — not a feature list. Practice your pitch on someone who knows nothing about your industry. If they do not lean forward, the opening is not working yet.'},
+    sA:{t:'Establish your communication rhythm this week',b:'Weekly team meeting — same time, same structure. Weekly 1:1 with each direct report — non-negotiable. This is not overhead. It is the infrastructure that makes everything else work. Set it up this week before the team builds around its absence.'},
+    sB:{t:'Build a decision filter and share it',b:'Not every decision needs you. Create a clear framework: decisions within defined scope and risk level can be made without you. Write it down. Share it. Stick to it. Delegation without a decision filter is abdication, not leadership.'},
+    scl:{t:'Map your team\'s cultural communication styles',b:'In internationally distributed teams, what reads as honest and caring in one cultural context reads differently in another. Ask each team member directly how they prefer to receive feedback. Then adapt. Cultural intelligence is not a soft skill — it is the infrastructure for performance across borders.'}
+  };
+
+  if (ph && phMap[ph]) pris.push(phMap[ph]);
+
+  if (st.dom === 'E') pris.push({t:'Watch the Pacesetting pattern', b:'Your instinct to show how it is done is powerful at this stage — and risky at the next. This month, practice one thing: before stepping in to fix or demonstrate, ask your team member what their approach is. Then listen to the answer, even if yours is better. That pause is where trust grows.'});
+
+  return pris.slice(0,3);
+}
+
+function renderScreen() {
+  var vq = visibleQs();
+  var q = vq[cur];
+  var sc = document.getElementById('screen');
+  sc.innerHTML = buildQ(q);
+  addListeners();
+  updateUI();
+  window.scrollTo(0,0);
+}
+
+function buildQ(q) {
+  if (q.type === 'welcome') return buildWelcome();
+  if (q.type === 'section') return buildSection(q);
+  if (q.type === 'results') return buildResults();
+
+  var h = '<div class="q-card">';
+  if (q.sec) h += '<div class="q-section">'+q.sec+'</div>';
+  h += '<div class="q-text">'+q.q+'</div>';
+  if (q.hint) h += '<div class="q-hint">'+q.hint+'</div>';
+
+  if (q.type === 'single') {
+    h += '<div class="options">';
+    q.opts.forEach(function(o){
+      var sel = ans[q.id] === o.k ? 'selected' : '';
+      h += '<div class="opt '+sel+'" data-qid="'+q.id+'" data-k="'+o.k+'" data-qtype="single"><div class="opt-dot"></div><span class="opt-label">'+o.l+'</span></div>';
+    });
+    h += '</div>';
+  }
+
+  if (q.type === 'pair') {
+    h += '<div class="pair-wrap">';
+    q.opts.forEach(function(o){
+      var sel = ans[q.id] === o.k ? 'selected' : '';
+      h += '<div class="pair-opt '+sel+'" data-qid="'+q.id+'" data-k="'+o.k+'" data-qtype="pair">'+o.l+'</div>';
+    });
+    h += '</div>';
+  }
+
+  if (q.type === 'multi') {
+    h += '<div class="options">';
+    q.opts.forEach(function(o){
+      var arr = ans[q.id] || [];
+      var sel = arr.indexOf(o.k) >= 0 ? 'selected' : '';
+      h += '<div class="opt '+sel+'" data-qid="'+q.id+'" data-k="'+o.k+'" data-qtype="multi" data-max="'+q.max+'"><div class="opt-dot opt-box"></div><span class="opt-label">'+o.l+'</span></div>';
+    });
+    h += '</div>';
+  }
+
+  if (q.type === 'rating') {
+    var r = ans[q.id] || {};
+    h += '<div class="rating-wrap"><div class="rating-head"><span></span><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span></div>';
+    q.stmts.forEach(function(stmt, si){
+      h += '<div class="rating-row"><div class="rating-stmt">'+stmt+'</div>';
+      for (var v=1;v<=5;v++){
+        var sel = r[si]===v ? 'selected' : '';
+        h += '<div class="r-btn '+sel+'" data-qid="'+q.id+'" data-si="'+si+'" data-v="'+v+'" data-qtype="rating">'+v+'</div>';
+      }
+      h += '</div>';
+    });
+    h += '</div>';
+  }
+
+  if (q.type === 'contact') {
+    h += '<div class="contact-field"><label>Your first name</label><input type="text" id="inp-name" placeholder="e.g. Maria" value="'+(ans['_name']||'')+'"></div>';
+    h += '<div class="contact-field"><label>Your email address</label><input type="email" id="inp-email" placeholder="you@company.com" value="'+(ans['_email']||'')+'"></div>';
+  }
+
+  h += '</div>';
+  return h;
+}
+
+function buildWelcome() {
+  return '<div class="welcome-card"><div class="badge">Leadership Navigator</div><h1>How do you lead — and what does your team need from you right now?</h1><p>A personalised assessment that combines your natural leadership style with your specific team context and company stage — and turns it into your First 100 Days Playbook.</p><div class="meta-pills"><span class="pill">⏱ <strong>15 minutes</strong></span><span class="pill">🎯 <strong>Personalised output</strong></span><span class="pill">✓ <strong>No wrong answers</strong></span></div></div>';
+}
+
+function buildSection(q) {
+  return '<div class="section-card"><div class="part">'+q.part+'</div><h2>'+q.title+'</h2><p>'+q.body+'</p></div>';
+}
+
+function buildResults() {
+  var st = calcStyle();
+  var stD = STYLE_INFO[st.dom];
+  var stS = STYLE_INFO[st.sec];
+  var strD = STR_INFO[calcStrength()];
+  var discD = DISC_INFO[calcDisc()];
+  var ph = PHASE_INFO[ans['phase']] || PHASE_INFO['seed'];
+  var loc = ans['loc'] || 'coloc';
+  var name = ans['_name'] || 'Leader';
+  var vals = ans['values'] || [];
+  var pris = getPriorities();
+
+  var locMsg = '';
+  if (loc === 'coloc') locMsg = 'Your team shares a physical space. Be deliberate about the conversations that need to happen intentionally — culture built by accident is culture built by whoever speaks loudest.';
+  else if (loc === 'hyb_d' || loc === 'hyb_t') locMsg = 'You are in the most complex leadership environment available. In hybrid settings, people in the room get more airtime and informal access. Build systems to counteract this — default to digital-first for anything that matters.';
+  else locMsg = 'Everything that proximity does automatically, you must now do deliberately. Trust takes longer to build. Culture must be designed, not absorbed. Your non-negotiable: weekly 1:1s with every direct report — this is where the relationship lives.';
+
+  var h = '';
+  h += '<div class="r-header"><div class="eyebrow">Your Leadership Navigator Profile</div><h2>Welcome, '+name+'.</h2><p>Here is your leadership profile and what it means for your first 100 days.</p></div>';
+
+  h += '<div class="r-card"><h3>Your Leadership Style</h3><div class="r-title">'+stD.name+' (primary) &middot; '+stS.name+' (secondary)</div>';
+  h += '<p><strong>Your superpower:</strong> '+stD.power+'</p>';
+  h += '<p><strong>Your watch-out:</strong> '+stD.watch+'</p>';
+  if (stD.flag) h += '<div class="flag-box"><strong>Important</strong>'+stD.flag+'</div>';
+  h += '</div>';
+
+  if (vals.length > 0) {
+    var valLabels = {'autonomy':'Autonomy','clarity':'Clarity','courage':'Courage','excellence':'Excellence','fairness':'Fairness','growth':'Growth','honesty':'Honesty','inclusion':'Inclusion','innovation':'Innovation','loyalty':'Loyalty','ownership':'Ownership','pace':'Pace','purpose':'Purpose','respect':'Respect','trust':'Trust','wellbeing':'Wellbeing'};
+    h += '<div class="r-card alt"><h3>Your Leadership Values</h3><div class="r-title">Your top 5 values</div><div class="tag-row">';
+    vals.forEach(function(v){ h += '<span class="tag">'+(valLabels[v]||v)+'</span>'; });
+    h += '</div>';
+    if (vals.indexOf('pace') >= 0 && vals.indexOf('wellbeing') >= 0) h += '<div class="flag-box"><strong>Values tension to watch:</strong> Pace and Wellbeing are both high priorities for you. Watch for the moment when your pace becomes the ceiling others feel they cannot exceed — or the floor they feel they cannot fall below.</div>';
+    h += '</div>';
+  }
+
+  h += '<div class="r-card"><h3>Your Natural Strengths</h3><div class="r-title">'+strD.name+'</div><p>'+strD.desc+'</p><p><strong>Lead from this by:</strong> '+strD.tip+'</p></div>';
+
+  h += '<div class="r-card alt"><h3>How You Show Up Under Pressure</h3><div class="r-title">'+discD.name+'</div><p>'+discD.desc+'</p></div>';
+
+  h += '<div class="r-card"><h3>Your Company Phase</h3><div class="r-title">'+ph.name+'</div><p>'+ph.desc+'</p><p><strong>What leadership means here:</strong> '+ph.focus+'</p></div>';
+
+  h += '<div class="r-card alt"><h3>Your Team Context</h3><p>'+locMsg+'</p>';
+  if (ans['cof_rel'] === 'strain') h += '<div class="flag-box"><strong>Co-founder priority:</strong> Your co-founder relationship needs attention before anything else in this playbook. An unresolved co-founder rupture undermines every other leadership investment you make.</div>';
+  h += '</div>';
+
+  h += '<div class="r-card"><h3>Your First 30 Days — Top Priorities</h3><div class="r-title">Where to focus first</div><div class="pri-list">';
+  pris.forEach(function(p, i){
+    h += '<div class="pri-item"><div class="pri-num">'+(i+1)+'</div><div><p><strong>'+p.t+'</strong><br>'+p.b+'</p></div></div>';
+  });
+  h += '</div></div>';
+
+  h += '<div class="cta-card"><h3>Your Full First 100 Days Playbook</h3><p>Your on-screen profile is just the beginning. The full playbook includes your complete Days 1-30, 31-60, and 61-100 plan — personalised to your style, your team, and your company phase. It arrives in your inbox within 24 hours.</p><div class="cta-row"><input type="email" id="cta-email" placeholder="'+(ans['_email']||'your@email.com')+'"><button class="btn btn-orange" onclick="submitPlaybook()">Send my playbook</button></div><div class="thanks-box" id="thanks-box">You are all set. Your playbook will arrive within 24 hours. &mdash; Sharon</div></div>';
+
+  h += '<div class="byline"><p>The Leadership Navigator by <a href="https://sharondehmel.com">Sharon Dehmel</a> &middot; Leadership Architect &middot; Intercultural Coach</p><p style="margin-top:4px">Questions? <a href="mailto:sharon@sharondehmel.com">sharon@sharondehmel.com</a></p></div>';
+
+  return h;
+}
+
+function addListeners() {
+  var sc = document.getElementById('screen');
+
+  sc.querySelectorAll('[data-qtype="single"]').forEach(function(el){
+    el.addEventListener('click', function(){
+      var qid = el.dataset.qid;
+      var k = el.dataset.k;
+      ans[qid] = k;
+      sc.querySelectorAll('[data-qid="'+qid+'"]').forEach(function(e){ e.classList.remove('selected'); });
+      el.classList.add('selected');
+      updateUI();
+      setTimeout(function(){ goNext(); }, 280);
+    });
+  });
+
+  sc.querySelectorAll('[data-qtype="pair"]').forEach(function(el){
+    el.addEventListener('click', function(){
+      var qid = el.dataset.qid;
+      var k = el.dataset.k;
+      ans[qid] = k;
+      sc.querySelectorAll('[data-qid="'+qid+'"]').forEach(function(e){ e.classList.remove('selected'); });
+      el.classList.add('selected');
+      updateUI();
+      setTimeout(function(){ goNext(); }, 280);
+    });
+  });
+
+  sc.querySelectorAll('[data-qtype="multi"]').forEach(function(el){
+    el.addEventListener('click', function(){
+      var qid = el.dataset.qid;
+      var k = el.dataset.k;
+      var mx = parseInt(el.dataset.max) || 99;
+      if (!ans[qid]) ans[qid] = [];
+      var idx = ans[qid].indexOf(k);
+      if (idx >= 0) {
+        ans[qid].splice(idx, 1);
+        el.classList.remove('selected');
+      } else {
+        if (ans[qid].length >= mx) return;
+        ans[qid].push(k);
+        el.classList.add('selected');
+      }
+      updateUI();
+    });
+  });
+
+  sc.querySelectorAll('[data-qtype="rating"]').forEach(function(el){
+    el.addEventListener('click', function(){
+      var qid = el.dataset.qid;
+      var si = parseInt(el.dataset.si);
+      var v = parseInt(el.dataset.v);
+      if (!ans[qid]) ans[qid] = {};
+      ans[qid][si] = v;
+      sc.querySelectorAll('[data-qid="'+qid+'"][data-si="'+si+'"]').forEach(function(e){ e.classList.remove('selected'); });
+      el.classList.add('selected');
+      updateUI();
+    });
+  });
+
+  var inpName = document.getElementById('inp-name');
+  var inpEmail = document.getElementById('inp-email');
+  if (inpName) inpName.addEventListener('input', function(){ ans['_name'] = this.value; updateUI(); });
+  if (inpEmail) inpEmail.addEventListener('input', function(){ ans['_email'] = this.value; updateUI(); });
+}
+
+function updateUI() {
+  var vq = visibleQs();
+  var q = vq[cur];
+  var isFirst = cur === 0;
+  var isResults = q && q.type === 'results';
+  var answered = isAnswered();
+  var nextBtn = document.getElementById('btn-next');
+  var backBtn = document.getElementById('btn-back');
+  var nav = document.getElementById('nav');
+
+  backBtn.style.visibility = isFirst ? 'hidden' : 'visible';
+  nav.style.display = isResults ? 'none' : 'flex';
+
+  if (nextBtn) {
+    nextBtn.disabled = !answered;
+    var vq2 = visibleQs();
+    var nq = vq2[cur];
+    nextBtn.textContent = (nq && nq.type === 'contact') ? 'See my results' : 'Continue';
+  }
+
+  var tot = totalSteps();
+  var done = doneSteps();
+  var pct = tot > 0 ? (done / tot * 100) : 0;
+  document.getElementById('progress-bar').style.width = pct + '%';
+
+  var ctr = document.getElementById('step-counter');
+  if (q && (q.type === 'welcome' || q.type === 'section' || q.type === 'results')) {
+    ctr.textContent = '';
+  } else if (q && q.id) {
+    ctr.textContent = done + ' of ' + tot + ' complete';
+  }
+}
+
+function goNext() {
+  if (!isAnswered()) return;
+  var vq = visibleQs();
+  if (cur < vq.length - 1) { cur++; renderScreen(); }
+}
+
+function goBack() {
+  if (cur > 0) { cur--; renderScreen(); }
+}
+
+function submitPlaybook() {
+  var emailEl = document.getElementById('cta-email');
+  var email = emailEl ? emailEl.value : (ans['_email'] || '');
+  if (!email || email.indexOf('@') < 0) {
+    if (emailEl) emailEl.style.border = '2px solid #E53E3E';
+    return;
+  }
+  var st = calcStyle();
+  var strD = STR_INFO[calcStrength()];
+  var discD = DISC_INFO[calcDisc()];
+  var valLabels = {'autonomy':'Autonomy','clarity':'Clarity','courage':'Courage','excellence':'Excellence','fairness':'Fairness','growth':'Growth','honesty':'Honesty','inclusion':'Inclusion','innovation':'Innovation','loyalty':'Loyalty','ownership':'Ownership','pace':'Pace','purpose':'Purpose','respect':'Respect','trust':'Trust','wellbeing':'Wellbeing'};
+  var vals = (ans['values']||[]).map(function(v){return valLabels[v]||v;}).join(', ');
+  var name = ans['_name'] || '';
+  var profile = 'Name: '+name+'\nEmail: '+email+'\nStyle: '+STYLE_INFO[st.dom].name+' / '+STYLE_INFO[st.sec].name+'\nStrengths: '+strD.name+'\nUnder Pressure: '+discD.name+'\nValues: '+vals+'\nPhase: '+(ans['phase']||'')+'\nUrgent: '+(ans['urgent']||'')+'\nLocation: '+(ans['loc']||'')+'\nSize: '+(ans['size']||'')+'\nCulture: '+(ans['cult']||'')+'\nCo-founder: '+(ans['cof']||'')+'\nCo-founder relationship: '+(ans['cof_rel']||'N/A')+'\nChallenges: '+((ans['chall']||[]).join(', '));
+
+  var form = document.createElement('form');
+  form.action = 'https://formsubmit.co/info@sharondehmel.com';
+  form.method = 'POST';
+  form.style.display = 'none';
+  var fields = {'_subject':'Leadership Navigator — '+name+' ('+STYLE_INFO[st.dom].name+', '+(ans['phase']||'')+')', '_captcha':'false', '_template':'box', 'name':name, 'email':email, 'profile':profile};
+  Object.keys(fields).forEach(function(k){
+    var inp = document.createElement('input');
+    inp.name = k; inp.value = fields[k];
+    form.appendChild(inp);
+  });
+  document.body.appendChild(form);
+  form.submit();
+
+  var tb = document.getElementById('thanks-box');
+  var cr = document.querySelector('.cta-row');
+  if (tb) tb.style.display = 'block';
+  if (cr) cr.style.display = 'none';
+}
+
+renderScreen();
+</script>
+</body>
+</html>
