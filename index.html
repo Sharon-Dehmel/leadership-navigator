@@ -820,6 +820,22 @@ function goBack() {
   if (cur > 0) { cur--; renderScreen(); }
 }
 
+var SUPABASE_URL = 'https://nbgabikdvqpmxxxsrcuv.supabase.co';
+var SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5iZ2FiaWtkdnFwbXh4eHNyY3V2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY1OTQ2ODMsImV4cCI6MjA5MjE3MDY4M30.Hw_UF-G5ygKnXT99NP7v6U2KTqUf2OjfdAUUzXsG-Eo';
+
+function saveToSupabase(record) {
+  fetch(SUPABASE_URL + '/rest/v1/responses', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'apikey': SUPABASE_KEY,
+      'Authorization': 'Bearer ' + SUPABASE_KEY,
+      'Prefer': 'return=minimal'
+    },
+    body: JSON.stringify(record)
+  }).catch(function(err) { console.error('Supabase save failed:', err); });
+}
+
 function submitPlaybook() {
   var emailEl = document.getElementById('cta-email');
   var email = emailEl ? emailEl.value : (ans['_email'] || '');
@@ -831,9 +847,31 @@ function submitPlaybook() {
   var strD = STR_INFO[calcStrength()];
   var discD = DISC_INFO[calcDisc()];
   var valLabels = {'autonomy':'Autonomy','clarity':'Clarity','courage':'Courage','excellence':'Excellence','fairness':'Fairness','growth':'Growth','honesty':'Honesty','inclusion':'Inclusion','innovation':'Innovation','loyalty':'Loyalty','ownership':'Ownership','pace':'Pace','purpose':'Purpose','respect':'Respect','trust':'Trust','wellbeing':'Wellbeing'};
-  var vals = (ans['values']||[]).map(function(v){return valLabels[v]||v;}).join(', ');
+  var vals = (ans['values']||[]).map(function(v){return valLabels[v]||v;});
   var name = ans['_name'] || '';
-  var profile = 'Name: '+name+'\nEmail: '+email+'\nStyle: '+STYLE_INFO[st.dom].name+' / '+STYLE_INFO[st.sec].name+'\nStrengths: '+strD.name+'\nUnder Pressure: '+discD.name+'\nValues: '+vals+'\nPhase: '+(ans['phase']||'')+'\nUrgent: '+(ans['urgent']||'')+'\nLocation: '+(ans['loc']||'')+'\nSize: '+(ans['size']||'')+'\nCulture: '+(ans['cult']||'')+'\nCo-founder: '+(ans['cof']||'')+'\nCo-founder relationship: '+(ans['cof_rel']||'N/A')+'\nChallenges: '+((ans['chall']||[]).join(', '));
+
+  saveToSupabase({
+    name: name,
+    email: email,
+    style_dominant: STYLE_INFO[st.dom].name,
+    style_secondary: STYLE_INFO[st.sec].name,
+    strengths_domain: strD.name,
+    disc_pressure: discD.name,
+    selected_values: vals,
+    phase: ans['phase'] || null,
+    focus_90_days: ans['focus'] || null,
+    urgent_challenge: ans['urgent'] || null,
+    team_location: ans['loc'] || null,
+    team_size: ans['size'] || null,
+    team_culture: ans['cult'] || null,
+    cofounder: ans['cof'] || null,
+    cofounder_relationship: ans['cof_rel'] || null,
+    cofounder_friction: ans['cof_fric'] || null,
+    challenges: ans['chall'] || null,
+    raw_answers: ans
+  });
+
+  var profile = 'Name: '+name+'\nEmail: '+email+'\nStyle: '+STYLE_INFO[st.dom].name+' / '+STYLE_INFO[st.sec].name+'\nStrengths: '+strD.name+'\nUnder Pressure: '+discD.name+'\nValues: '+vals.join(', ')+'\nPhase: '+(ans['phase']||'')+'\nUrgent: '+(ans['urgent']||'')+'\nLocation: '+(ans['loc']||'')+'\nSize: '+(ans['size']||'')+'\nCulture: '+(ans['cult']||'')+'\nCo-founder: '+(ans['cof']||'')+'\nCo-founder relationship: '+(ans['cof_rel']||'N/A')+'\nChallenges: '+((ans['chall']||[]).join(', '));
 
   var form = document.createElement('form');
   form.action = 'https://formsubmit.co/info@sharondehmel.com';
