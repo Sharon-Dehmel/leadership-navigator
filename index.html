@@ -474,7 +474,7 @@ function isAnswered() {
     return Object.keys(r).length === q.stmts.length;
   }
   if (q.type === 'contact') {
-    return !!(ans['_name'] && ans['_email'] && ans['_email'].indexOf('@') > 0);
+    return !!(ans['_name'] && ans['_company'] && ans['_email'] && ans['_email'].indexOf('@') > 0);
   }
   return true;
 }
@@ -639,6 +639,7 @@ function buildQ(q) {
 
   if (q.type === 'contact') {
     h += '<div class="contact-field"><label>Your first name</label><input type="text" id="inp-name" placeholder="e.g. Maria" value="'+(ans['_name']||'')+'"></div>';
+    h += '<div class="contact-field"><label>Your company name</label><input type="text" id="inp-company" placeholder="e.g. Acme Labs" value="'+(ans['_company']||'')+'"></div>';
     h += '<div class="contact-field"><label>Your email address</label><input type="email" id="inp-email" placeholder="you@company.com" value="'+(ans['_email']||'')+'"></div>';
   }
 
@@ -774,6 +775,8 @@ function addListeners() {
   var inpName = document.getElementById('inp-name');
   var inpEmail = document.getElementById('inp-email');
   if (inpName) inpName.addEventListener('input', function(){ ans['_name'] = this.value; updateUI(); });
+  var inpCompany = document.getElementById('inp-company');
+  if (inpCompany) inpCompany.addEventListener('input', function(){ ans['_company'] = this.value; updateUI(); });
   if (inpEmail) inpEmail.addEventListener('input', function(){ ans['_email'] = this.value; updateUI(); });
 }
 
@@ -823,6 +826,17 @@ function goBack() {
 var SUPABASE_URL = 'https://nbgabikdvqpmxxxsrcuv.supabase.co';
 var SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5iZ2FiaWtkdnFwbXh4eHNyY3V2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY1OTQ2ODMsImV4cCI6MjA5MjE3MDY4M30.Hw_UF-G5ygKnXT99NP7v6U2KTqUf2OjfdAUUzXsG-Eo';
 
+var LOC_LABELS = {coloc:'Fully co-located',hyb_d:'Hybrid (dominant location)',hyb_t:'True hybrid',rem_f:'Remote-first',rem_r:'Fully remote / distributed'};
+var SIZE_LABELS = {solo:'No direct reports yet',sm:'2–5 people',md:'6–15 people',lg:'16–40 people',xl:'40+ people'};
+var EXP_LABELS = {jr:'Mostly early career',sr:'Mostly experienced (5+ years)',mix:'Mixed experience levels',spec:'Deep specialists',ldrs:'Leading other managers'};
+var CULT_LABELS = {mono:'Same cultural background',bi:'One or two other cultures',multi:'Multicultural (3+ nationalities)',dist:'Internationally distributed',uns:'Not mapped yet'};
+var COF_LABELS = {solo:'Solo founder',one:'One co-founder',multi:'Two or more co-founders'};
+var COF_REL_LABELS = {strong:'Strong',func:'Functional',strain:'Strained',early:'Early days'};
+var PHASE_LABELS = {pre:'Pre-seed / Idea',seed:'Seed / MVP',sA:'Series A / Early Growth',sB:'Series B+ / Scaling',scl:'Scale-up / International'};
+var URGENT_LABELS = {pitch:'Pitching and influencing',trust:'Building trust with team',trans:'Transitioning from doing to leading',cofnd:'Managing co-founder relationship',cult:'Building culture deliberately',dist:'Leading across distance / cultures',feedb:'Giving better feedback',dev:'Developing people',up:'Managing up',conf:'Building confidence as a leader'};
+var CHALL_LABELS = {c0:'Alignment on direction',c1:'Honest feedback without damaging relationships',c2:'Building trust at distance or across cultures',c3:'Motivating with limited resources',c4:'Co-founder dynamics',c5:'Clear expectations without micromanaging',c6:'Intentional culture building',c7:'Sustaining energy through uncertainty',c8:'Performance conversations',c9:'Leading former peers',c10:'Investor / board buy-in',c11:'Cross-cultural leadership',c12:'Building a feedback culture',c13:'Managing self-confidence',c14:'Balancing speed with quality'};
+var CF_LABELS = {cf0:'Decision-making',cf1:'Communication style',cf2:'Pace differences',cf3:'Vision differences',cf4:'Role ambiguity',cf5:'Values differences',cf6:'No significant friction'};
+
 function saveToSupabase(record) {
   fetch(SUPABASE_URL + '/rest/v1/responses', {
     method: 'POST',
@@ -853,25 +867,26 @@ function submitPlaybook() {
   saveToSupabase({
     name: name,
     email: email,
+    company_name: ans['_company'] || null,
     style_dominant: STYLE_INFO[st.dom].name,
     style_secondary: STYLE_INFO[st.sec].name,
     strengths_domain: strD.name,
     disc_pressure: discD.name,
     selected_values: vals,
-    phase: ans['phase'] || null,
-    focus_90_days: ans['focus'] || null,
-    urgent_challenge: ans['urgent'] || null,
-    team_location: ans['loc'] || null,
-    team_size: ans['size'] || null,
-    team_culture: ans['cult'] || null,
-    cofounder: ans['cof'] || null,
-    cofounder_relationship: ans['cof_rel'] || null,
-    cofounder_friction: ans['cof_fric'] || null,
-    challenges: ans['chall'] || null,
+    phase: PHASE_LABELS[ans['phase']] || ans['phase'] || null,
+    urgent_challenge: URGENT_LABELS[ans['urgent']] || ans['urgent'] || null,
+    team_location: LOC_LABELS[ans['loc']] || ans['loc'] || null,
+    team_size: SIZE_LABELS[ans['size']] || ans['size'] || null,
+    team_experience: EXP_LABELS[ans['exp']] || ans['exp'] || null,
+    team_culture: CULT_LABELS[ans['cult']] || ans['cult'] || null,
+    cofounder: COF_LABELS[ans['cof']] || ans['cof'] || null,
+    cofounder_relationship: COF_REL_LABELS[ans['cof_rel']] || null,
+    cofounder_friction: (ans['cof_fri'] || []).map(function(k){ return CF_LABELS[k] || k; }),
+    challenges: (ans['chall'] || []).map(function(k){ return CHALL_LABELS[k] || k; }),
     raw_answers: ans
   });
 
-  var profile = 'Name: '+name+'\nEmail: '+email+'\nStyle: '+STYLE_INFO[st.dom].name+' / '+STYLE_INFO[st.sec].name+'\nStrengths: '+strD.name+'\nUnder Pressure: '+discD.name+'\nValues: '+vals.join(', ')+'\nPhase: '+(ans['phase']||'')+'\nUrgent: '+(ans['urgent']||'')+'\nLocation: '+(ans['loc']||'')+'\nSize: '+(ans['size']||'')+'\nCulture: '+(ans['cult']||'')+'\nCo-founder: '+(ans['cof']||'')+'\nCo-founder relationship: '+(ans['cof_rel']||'N/A')+'\nChallenges: '+((ans['chall']||[]).join(', '));
+  var profile = 'Name: '+name+'\nCompany: '+(ans['_company']||'—')+'\nEmail: '+email+'\nStyle: '+STYLE_INFO[st.dom].name+' / '+STYLE_INFO[st.sec].name+'\nStrengths: '+strD.name+'\nUnder Pressure: '+discD.name+'\nValues: '+vals.join(', ')+'\nPhase: '+(PHASE_LABELS[ans['phase']]||ans['phase']||'')+'\nUrgent: '+(URGENT_LABELS[ans['urgent']]||ans['urgent']||'')+'\nLocation: '+(LOC_LABELS[ans['loc']]||ans['loc']||'')+'\nSize: '+(SIZE_LABELS[ans['size']]||ans['size']||'')+'\nExperience: '+(EXP_LABELS[ans['exp']]||ans['exp']||'')+'\nCulture: '+(CULT_LABELS[ans['cult']]||ans['cult']||'')+'\nCo-founder: '+(COF_LABELS[ans['cof']]||ans['cof']||'')+'\nCo-founder relationship: '+(COF_REL_LABELS[ans['cof_rel']]||'N/A')+'\nChallenges: '+((ans['chall']||[]).map(function(k){return CHALL_LABELS[k]||k;}).join(', '));
 
   var form = document.createElement('form');
   form.action = 'https://formsubmit.co/info@sharondehmel.com';
